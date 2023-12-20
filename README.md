@@ -8,9 +8,7 @@
 
 ## Instalation
 ```
-git clone https://github.com/LBY-L/BYTop.git 
-cd BYTop 
-pip3 install .
+pip3 install git+https://github.com/LBY-L/BYTop.git
 ```
 
 ## Run
