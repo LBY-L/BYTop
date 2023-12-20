@@ -1,24 +1,59 @@
-import platform, sys, psutil, os, signal
+import platform, sys, psutil, os, signal, re
 from time import sleep
 
+#BLACK = u"\u001b[30m"
+#WHITE = u"\u001b[37m"
+#RED = u"\u001b[31m"
+#YELLOW = u"\u001b[33m"
+#GREEN = u"\u001b[32m"
+#CYAN = u"\u001b[36m"
+#BLUE = u"\u001b[34m"
+#PURPLE = u"\u001b[35m"
+
+RESET = u"\u001b[0m"
+
+# STATUS
+STATUS_TITLE = u"\u001b[33m"
+KERNEL = u"\u001b[33m"
+SYSTEM = u"\u001b[36m"
+UPTIME = u"\u001b[31m"
+CPU = u"\u001b[35m"
+
+# PROGRESS BARS
+BARS = u"\u001b[33m"
+
+# RAM
+RAM_TITLE = u"\u001b[31m"
+PERCENTAJE = u"\u001b[36m"
+
+# CPU
+CPU_TITLE = u"\u001b[34m"
+THREADS = u"\u001b[32m"
+
+def up(position=int):
+    return u"\u001b[" + str(position) + "A"
+
 def sigint_handler(signum, frame):
-    sys.stdout.write(u"\u001b[" + str(SpaceOfElm) + "A") # Goes up and starts erasing
-    Ereser = "\n" + " " * os.get_terminal_size().columns
-    sys.stdout.write(Ereser * SpaceOfElm)
-    sys.stdout.write(u"\u001b[" + str(SpaceOfElm+1) + "A") # Goes up and ends
-    Eraser = os.get_terminal_size().columns - 7
-    print(" Exit..." + " " * Eraser) # Print exit for more beauty
+    sys.stdout.write(up(SpaceOfElm)) # Goes up and starts erasing
+    sys.stdout.write(("\n" + " " * os.get_terminal_size().columns) * SpaceOfElm)
+    sys.stdout.write(up(SpaceOfElm + 1)) # Goes up and ends
+    print(" " * os.get_terminal_size().columns + RESET) # Print exit for more beauty
     exit()
 signal.signal(signal.SIGINT, sigint_handler)
 
+def skipAnsi(text=str):
+    # Uses a regular expresions for substract the ansi
+    ansiEscape = re.compile(r'\x1B\[[0-?]*[ -/]*[@-~]') # IDK Chat GPT gives me it
+    noAnsi = ansiEscape.sub('', text)
+    return len(noAnsi)
 
 def dashes(text=str, width=int, title=str):
     lines = text.splitlines() # Split by \n
-    newWidth = width - len(title) # Calculates the width for the title and styling
+    newWidth = width - skipAnsi(title) # Calculates the width for the title and styling
     # Makes the dash/box
-    res = ['┌' + title + '─' * newWidth + '┐'] 
+    res = ['┌' + title + '─' * newWidth + '┐']
     for s in lines:
-        res.append('│' + (s + ' ' * width)[:width] + '│')
+        res.append('│' + s + ' ' * max(0, width - skipAnsi(s)) + '│')  # Add spaces without ANSI characters
     res.append('└' + '─' * width + '┘')
     return res
 
@@ -36,7 +71,7 @@ def PCcomponents():
     kernel = platform.uname()[2] # Get Kernel
     
     # Returns the dash
-    res = dashes(f"System: {linuxDistro} \nKernel: {kernel} \nUptime: {uptime} \nCPU: {cpuinfo}", width//2-2, title="|PC Status|")
+    res = dashes(f"{SYSTEM}System:{RESET} {linuxDistro} \n{KERNEL}Kernel:{RESET} {kernel} \n{UPTIME}Uptime:{RESET} {uptime} \n{CPU}CPU:{RESET} {cpuinfo}", width//2-2, title=f"|{STATUS_TITLE} PC STATUS {RESET}|")
     return res
     
 def RamStatus():
@@ -50,7 +85,7 @@ def RamStatus():
     ramDis = int((int(PerRam)/100) * BarWidth) 
     Len = BarWidth - ramDis
     # Returns the dash
-    res = dashes(str(PerRam) + "%\n" + "[" + '■' * ramDis + " " * Len + More + "]" + "\n \n \n", width//2-2, title="|Ram|")
+    res = dashes(f"{PERCENTAJE}{str(PerRam)}%{RESET}\n" + "[" + BARS + '■' * ramDis + RESET + " " * Len + More + "]" + "\n \n \n", width//2-2, title=f"|{RAM_TITLE} RAM {RESET}|")
     return res
 
 def CPUStatus():
@@ -76,12 +111,12 @@ def CPUStatus():
         if i == 0:
             bars = bars + " " + str(Cores) + " Cores " + str(Threads) + " Threads" 
         if i % Columns != 0:
-            bars = bars + " " + str(i) + "[" + '■' * CpuDis + " " * Len + More + "]"
+            bars = bars + " " + f"{THREADS}{str(i)}{RESET}" + "[" + BARS + '■' * CpuDis + RESET + " " * Len + More + "]"
         else:
-            bars = bars + "\n " + str(i) + "[" + '■' * CpuDis + " " * Len + More + "]"
+            bars = bars + "\n " + f"{THREADS}{str(i)}{RESET}" + "[" + BARS + '■' * CpuDis + RESET + " " * Len + More + "]"
             
     # Return the dash
-    res = dashes(bars, width-2, title="|CPU|")
+    res = dashes(bars, width-2, title=f"|{CPU_TITLE} CPU {RESET}|")
     return res
 
 def main():
@@ -101,12 +136,14 @@ def main():
         CPU = CPUStatus()
         
         # The really final print
-        sys.stdout.write(u"\u001b[" + str(SpaceOfElm) + "A") # Move up
+        sys.stdout.write(up(SpaceOfElm)) # Move up
+        
         for i in range(len(Components)):
             print(Components[i] + Ram[i])
+        
         print("\n".join(CPU))
         print("QUIT: ^C")
-        sleep(0.6) # Less epilepsy
-    
+        sleep(1) # Less epilepsy
+
 if __name__ == "__main__":
-    main() # Starts
+    main()
