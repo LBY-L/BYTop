@@ -4,7 +4,7 @@ setup(
     name="bytop",
     version="1.0",
     author="LBY_L",
-    license='GNU General Public License',
+    license='GNU General Public License 3.0 (GPL 3.0)',
     description="BYTop a cli dash to show up ram and cpu stats 🚀",
     long_description_content_type="cli/tui",
     long_description="",
@@ -21,3 +21,4 @@ setup(
         "Operating System :: Linux",
     ]
 )
+# Hmm... i think that AnotherPing is 🏳️‍🌈
