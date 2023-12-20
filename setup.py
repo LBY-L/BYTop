@@ -7,8 +7,6 @@ setup(
     author="LBY_L",
     license='GNU General Public License 3.0 (GPL 3.0)',
     description="BYTop a cli dash to show up ram and cpu stats 🚀",
-    long_description_content_type="cli/tui",
-    long_description="",
     entry_points={
         'console_scripts': 'bytop = BYTop.bytop:main'
     },
