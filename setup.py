@@ -2,6 +2,7 @@ from setuptools import setup, find_packages
 # Setting up
 setup(
     name="bytop",
+    python_requires='>=3.8',
     version="1.0",
     author="LBY_L",
     license='GNU General Public License 3.0 (GPL 3.0)',
