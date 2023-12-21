@@ -37,7 +37,7 @@ def sigint_handler(signum, frame):
     sys.stdout.write(up(SpaceOfElm)) # Goes up and starts erasing
     sys.stdout.write(("\n" + " " * os.get_terminal_size().columns) * SpaceOfElm)
     sys.stdout.write(up(SpaceOfElm + 1)) # Goes up and ends
-    print(" " * os.get_terminal_size().columns + RESET) # Print exit for more beauty
+    print(" " * (os.get_terminal_size().columns + 1) + RESET) # Print exit for more beauty
     exit()
 signal.signal(signal.SIGINT, sigint_handler)
 
@@ -53,7 +53,7 @@ def dashes(text=str, width=int, title=str):
     # Makes the dash/box
     res = ['┌' + title + '─' * newWidth + '┐']
     for s in lines:
-        res.append('│' + s + ' ' * max(0, width - skipAnsi(s)) + '│')  # Add spaces without ANSI characters
+        res.append('│' + (s + ' ' * width)[:width + (len(s) - skipAnsi(s))] + '│') # Add spaces without ANSI characters
     res.append('└' + '─' * width + '┘')
     return res
 
