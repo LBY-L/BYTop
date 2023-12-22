@@ -135,6 +135,7 @@ def main():
             exit()
 
         # Gets the dashes
+        global width
         width = get_terminal_size().columns # Re calculates the screen width
         Ram = RAMStatus()
         Components = PCcomponents()
