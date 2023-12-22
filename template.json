@@ -1,0 +1,12 @@
+{
+    "STATUS_TITLE": "\u001b[33m",
+    "KERNEL": "\u001b[33m",
+    "SYSTEM": "\u001b[36m",
+    "UPTIME": "\u001b[31m",
+    "CPU_MODEL": "\u001b[35m",
+    "PROGRESS_BARS": "\u001b[33m",
+    "RAM_TITLE": "\u001b[31m",
+    "PERCENTAJE": "\u001b[36m",
+    "CPU_TITLE": "\u001b[34m",
+    "THREADS": "\u001b[32m"
+}

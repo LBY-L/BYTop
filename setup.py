@@ -3,10 +3,10 @@ from setuptools import setup, find_packages
 setup(
     name="bytop",
     python_requires='>=3.8',
-    version="1.1.1",
+    version="1.1.2",
     author="LBY_L",
     license='GNU General Public License 3.0 (GPL 3.0)',
-    description="BYTop a cli dash to show up ram and cpu stats 🚀",
+    description="BYTop a cli dash to show up RAM and CPU stats 🚀",
     entry_points={
         'console_scripts': 'bytop = BYTop.bytop:main'
     },

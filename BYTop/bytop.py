@@ -1,48 +1,21 @@
-import platform, sys, psutil, os, signal, re
+import platform, psutil, os, signal, re
+from os import get_terminal_size
+from sys import stderr, stdout
+from .cli import cli
 from time import sleep
-
-#BLACK = u"\u001b[30m"
-#WHITE = u"\u001b[37m"
-#RED = u"\u001b[31m"
-#YELLOW = u"\u001b[33m"
-#GREEN = u"\u001b[32m"
-#CYAN = u"\u001b[36m"
-#BLUE = u"\u001b[34m"
-#PURPLE = u"\u001b[35m"
-
-RESET = u"\u001b[0m"
-
-# STATUS
-STATUS_TITLE = u"\u001b[33m"
-KERNEL = u"\u001b[33m"
-SYSTEM = u"\u001b[36m"
-UPTIME = u"\u001b[31m"
-CPU = u"\u001b[35m"
-
-# PROGRESS BARS
-BARS = u"\u001b[33m"
-
-# RAM
-RAM_TITLE = u"\u001b[31m"
-PERCENTAJE = u"\u001b[36m"
-
-# CPU
-CPU_TITLE = u"\u001b[34m"
-THREADS = u"\u001b[32m"
 
 def up(position=int):
     return u"\u001b[" + str(position) + "A"
 
 def sigint_handler(signum, frame):
-    sys.stdout.write(up(SpaceOfElm)) # Goes up and starts erasing
-    sys.stdout.write(("\n" + " " * os.get_terminal_size().columns) * SpaceOfElm)
-    sys.stdout.write(up(SpaceOfElm + 1)) # Goes up and ends
-    print(" " * (os.get_terminal_size().columns + 1) + RESET) # Print exit for more beauty
+    echo(up(SpaceOfElm) + 
+         ("\n" + " " * get_terminal_size().columns) * SpaceOfElm +
+         up(SpaceOfElm + 1) +
+         " " * (get_terminal_size().columns + 1) + RESET) # Goes up and starts erasing
     exit()
 signal.signal(signal.SIGINT, sigint_handler)
 
 def skipAnsi(text=str):
-    # Uses a regular expresions for substract the ansi
     ansiEscape = re.compile(r'\x1B\[[0-?]*[ -/]*[@-~]') # IDK Chat GPT gives me it
     noAnsi = ansiEscape.sub('', text)
     return len(noAnsi)
@@ -74,7 +47,7 @@ def PCcomponents():
     res = dashes(f"{SYSTEM}System:{RESET} {linuxDistro} \n{KERNEL}Kernel:{RESET} {kernel} \n{UPTIME}Uptime:{RESET} {uptime} \n{CPU}CPU:{RESET} {cpuinfo}", width//2-2, title=f"|{STATUS_TITLE} PC STATUS {RESET}|")
     return res
     
-def RamStatus():
+def RAMStatus():
     # Ram %, Used Ram, System Ram
     PerRam = psutil.virtual_memory()[2]
     UsedRam = round(psutil.virtual_memory()[3]/1000000000, 2)
@@ -119,31 +92,60 @@ def CPUStatus():
     res = dashes(bars, width-2, title=f"|{CPU_TITLE} CPU {RESET}|")
     return res
 
-def main():
-    global width
-    width = os.get_terminal_size().columns # Terminal width *Neded for future calculations*
-    CPU = CPUStatus() # Skipping bugs XD
-    global SpaceOfElm  # Skipping bugs XD
+def load(): # Loader
+    data = cli()
+    # Aliases
+    global echo, echoErr
+    echoErr = stderr.write
+    echo = stdout.write
+    # PC STATUS
+    global STATUS_TITLE, KERNEL, SYSTEM, UPTIME, CPU, BARS, RAM_TITLE, PERCENTAJE, CPU_TITLE, THREADS, RESET
+    RESET = "\u001b[0m"
+    STATUS_TITLE = data["STATUS_TITLE"]
+    KERNEL = data["KERNEL"]
+    SYSTEM = data["SYSTEM"]
+    UPTIME = data["UPTIME"]
+    CPU = data["CPU_MODEL"]
     
-    # Making space in the screen
-    SpaceOfElm = 6 + len(CPU) + 1 
-    sys.stdout.write("\n" * SpaceOfElm)
+    # BARS
+    BARS = data["PROGRESS_BARS"]
+    
+    # RAM
+    RAM_TITLE = data["RAM_TITLE"]
+    PERCENTAJE = data["PERCENTAJE"]
+    
+    # CPU
+    CPU_TITLE = data["CPU_TITLE"]
+    THREADS = data["THREADS"]
+    
+    global width
+    width = get_terminal_size().columns # Terminal width *Neded for future calculations*
+    
+    global SpaceOfElm  # Skipping bugs XD
+    SpaceOfElm = 6 + len(CPUStatus()) + 1 # Prepares space  
+
+def main():
+    load() # Loads the esencial values
+    
+    echo("\n" * SpaceOfElm) # Makes space in the screen
     while True:
-        width = os.get_terminal_size().columns
-        # Gets the dashes of the main()
-        Ram = RamStatus()
+        
+        if SpaceOfElm+1 >= get_terminal_size().lines: # Comprobates the screen height size
+            echoErr(up(SpaceOfElm) + "ERROR: The terminal isn't hight enough!") 
+            exit()
+
+        # Gets the dashes
+        width = get_terminal_size().columns # Re calculates the screen width
+        Ram = RAMStatus()
         Components = PCcomponents()
-        CPU = CPUStatus()
+        CPUStats = CPUStatus()
         
         # The really final print
-        sys.stdout.write(up(SpaceOfElm)) # Move up
-        
+
+        echo(up(SpaceOfElm)) # Move up
+
         for i in range(len(Components)):
             print(Components[i] + Ram[i])
-        
-        print("\n".join(CPU))
-        print("QUIT: ^C")
-        sleep(1) # Less epilepsy
 
-if __name__ == "__main__":
-    main()
+        print("\n".join(CPUStats) + "\nQUIT: ^C")
+        sleep(0.7) # Less epilepsy
