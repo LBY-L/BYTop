@@ -16,7 +16,7 @@ pip3 install git+https://github.com/LBY-L/BYTop.git
 ```
 bytop
 ```
-### Or
+#### Or
 ```
 python3 -m bytop
 ```
