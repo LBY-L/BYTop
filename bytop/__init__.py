@@ -1,0 +1,2 @@
+from .bytop import *
+main()
