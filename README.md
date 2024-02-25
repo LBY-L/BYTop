@@ -16,6 +16,10 @@ pip3 install git+https://github.com/LBY-L/BYTop.git
 ```
 bytop
 ```
+### Or
+```
+python3 -m bytop
+```
 
 ## Customize ⭐
 To customize, look out the [wiki](https://github.com/LBY-L/BYTop/wiki)!
