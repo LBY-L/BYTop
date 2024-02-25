@@ -9,7 +9,7 @@
 
 ## Instalation
 ```
-pip3 install git+https://github.com/LBY-L/BYTop.git
+pip3 install --force git+https://github.com/LBY-L/BYTop.git
 ```
 
 ## Run
